@@ -31,6 +31,7 @@ from ensembl.core.models import SeqRegion, SeqRegionSynonym, SeqRegionAttrib
 
 ROOT_DIR = Path(__file__).parent / "../../../../.."
 DEFAULT_MAP = ROOT_DIR / "config/external_db_map/default.txt"
+KARYOTYPE_STRUCTURE = {"TEL": "telomere", "ACEN": "centromere"}
 
 
 def get_external_db_map(map_file: Path) -> Dict:
@@ -66,7 +67,10 @@ def get_seq_regions(session: Session, external_db_map: dict) -> List[SeqRegion]:
 
         attribs = get_attribs(seqr)
         if attribs:
-            seq_region["attribs"] = attribs
+            attrib_dict = {attrib["source"]: attrib["value"] for attrib in attribs}
+            if "toplevel" not in attrib_dict:
+                continue
+            add_attribs(seq_region, attrib_dict)
 
         karyotype = get_karyotype(seqr)
         if karyotype:
@@ -75,6 +79,40 @@ def get_seq_regions(session: Session, external_db_map: dict) -> List[SeqRegion]:
         seq_regions.append(seq_region)
 
     return seq_regions
+
+
+def add_attribs(seq_region: Dict, attrib_dict: Dict) -> None:
+    bool_attribs = {
+        "circular_seq": "circular",
+        "non_ref": "non_ref",
+    }
+    int_attribs = {
+        "codon_table": "codon_table",
+    }
+    string_attribs = {
+        "BRC4_seq_region_name": "BRC4_seq_region_name",
+        "EBI_seq_region_name": "EBI_seq_region_name",
+        "coord_system_tag": "coord_system_level",
+        "sequence_location": "location",
+    }
+
+    for name in bool_attribs:
+        value = attrib_dict.get(name)
+        if value:
+            key = bool_attribs[name]
+            seq_region[key] = bool(value)
+
+    for name in int_attribs:
+        value = attrib_dict.get(name)
+        if value:
+            key = int_attribs[name]
+            seq_region[key] = int(value)
+
+    for name in string_attribs:
+        value = attrib_dict.get(name)
+        if value:
+            key = string_attribs[name]
+            seq_region[key] = str(value)
 
 
 def get_synonyms(seq_region: SeqRegion, external_db_map: dict) -> List:
@@ -110,6 +148,9 @@ def get_karyotype(seq_region: SeqRegion) -> List:
                 kar["band"] = band.band
             if band.stain:
                 kar["stain"] = band.stain
+                structure = KARYOTYPE_STRUCTURE.get(band.stain, "")
+                if structure:
+                    kar["structure"] = structure
             kars.append(kar)
     return kars
 
