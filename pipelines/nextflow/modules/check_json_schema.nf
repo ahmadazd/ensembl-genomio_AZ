@@ -28,7 +28,7 @@ process CHECK_JSON_SCHEMA {
 
     script:
         script_dir = workflow.projectDir.toString()
-        schema_path = new File(script_dir + "/../../schema", schema_name + "_schema.json")
+        schema_path = new File(script_dir + "/../../../../schemas", schema_name + "_schema.json")
         """
         check_json_schema --json_file ${json_file} --json_schema ${schema_path}
         """
