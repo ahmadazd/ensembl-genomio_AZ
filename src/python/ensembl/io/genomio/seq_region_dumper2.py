@@ -24,10 +24,10 @@ from typing import Dict, List
 
 import argschema
 from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from ensembl.database import DBConnection
-from ensembl.core.models import SeqRegion
+from ensembl.core.models import SeqRegion, SeqRegionSynonym, SeqRegionAttrib
 
 ROOT_DIR = Path(__file__).parent / "../../../../.."
 DEFAULT_MAP = ROOT_DIR / "config/external_db_map/default.txt"
@@ -50,7 +50,11 @@ def get_external_db_map(map_file: Path) -> Dict:
 
 
 def get_seq_regions(session: Session, external_db_map: dict) -> List[SeqRegion]:
-    seqr_stmt = select(SeqRegion)
+    seqr_stmt = select(SeqRegion).options(
+        joinedload(SeqRegion.seq_region_synonym).joinedload(SeqRegionSynonym.external_db),
+        joinedload(SeqRegion.seq_region_attrib).joinedload(SeqRegionAttrib.attrib_type),
+        joinedload(SeqRegion.karyotype),
+    )
     seq_regions = []
     for row in session.execute(seqr_stmt).unique().all():
         seqr: SeqRegion = row[0]
@@ -167,7 +171,7 @@ def main() -> None:
     if args.get("output_json"):
         output_file = Path(args.get("output_json"))
         with output_file.open("w") as output_fh:
-            output_fh.write(json.dumps(seq_regions, indent=2))
+            output_fh.write(json.dumps(seq_regions, indent=2, sort_keys=True))
     else:
         print(seq_regions)
 
