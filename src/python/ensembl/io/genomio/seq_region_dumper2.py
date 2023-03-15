@@ -30,7 +30,7 @@ from ensembl.database import DBConnection
 from ensembl.core.models import SeqRegion
 
 ROOT_DIR = Path(__file__).parent / "../../../../.."
-DEFAULT_MAP = ROOT_DIR / "data/external_db_map_default.txt"
+DEFAULT_MAP = ROOT_DIR / "config/external_db_map/default.txt"
 
 
 def get_external_db_map(map_file: Path) -> Dict:
