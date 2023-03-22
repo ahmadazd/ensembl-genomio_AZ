@@ -192,6 +192,7 @@ class InputSchema(argschema.ArgSchema):
         dump_default=str(DEFAULT_MAP),
         metadata={"description": "File with external_db mapping"},
     )
+    brc_mode = argschema.fields.Bool(default=False, metadata={"description": "BRC specific output"})
 
 
 def make_mysql_url(host: str, user: str, database: str, port: str = 0, password: str = "") -> str:
