@@ -166,7 +166,7 @@ def get_karyotype(seq_region: SeqRegion) -> List:
         for band in bands:
             kar = {"start": band.seq_region_start, "end": band.seq_region_end}
             if band.band:
-                kar["band"] = band.band
+                kar["name"] = band.band
             if band.stain:
                 kar["stain"] = band.stain
                 structure = KARYOTYPE_STRUCTURE.get(band.stain, "")
