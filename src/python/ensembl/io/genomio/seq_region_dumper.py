@@ -138,10 +138,13 @@ def get_synonyms(seq_region: SeqRegion, external_db_map: dict) -> List:
     syns = []
     if synonyms:
         for syn in synonyms:
-            source = syn.external_db.db_name
-            if source in external_db_map:
-                source = external_db_map[source]
-            syn_obj = {"synonym": syn.synonym, "source": source}
+            if syn.external_db:
+                source = syn.external_db.db_name
+                if source in external_db_map:
+                    source = external_db_map[source]
+                syn_obj = {"name": syn.synonym, "source": source}
+            else:
+                syn_obj = {"name": syn.synonym}
             syns.append(syn_obj)
     return syns
 
