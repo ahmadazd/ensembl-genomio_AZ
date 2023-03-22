@@ -91,11 +91,13 @@ def get_all_seq_regions(server: CoreServer, database: str) -> List[SeqRegion]:
         # Add Synonyms
         syns = seqr_syns.get(seq_id)
         if syns:
+            syns = sorted(syns, key=lambda syn: (syn.synonym, syn.source))
             seqr.synonyms += syns
 
         # Add Karyotypes
         kars = karyotypes.get(seq_id)
         if kars:
+            kars = sorted(kars, key=lambda kar: kar.band)
             seqr.karyotype_bands += kars
 
         # Filtering
@@ -104,6 +106,7 @@ def get_all_seq_regions(server: CoreServer, database: str) -> List[SeqRegion]:
 
     print(f"Got {len(final_seq_regions)} seq_regions dumped")
 
+    final_seq_regions = sorted(final_seq_regions, key=lambda seqr: (seqr._get_coord_system_level(), seqr.name))
     return final_seq_regions
 
 
