@@ -86,6 +86,9 @@ def get_seq_regions(session: Session, external_db_map: dict) -> List[SeqRegion]:
                 if "toplevel" not in attrib_dict:
                     continue
                 add_attribs(seq_region, attrib_dict)
+            else:
+                # Skip seq_region without attribs, not toplevel
+                continue
 
             karyotype = get_karyotype(seqr)
             if karyotype:
@@ -96,6 +99,7 @@ def get_seq_regions(session: Session, external_db_map: dict) -> List[SeqRegion]:
 
             seq_regions.append(seq_region)
 
+    seq_regions = sorted(seq_regions, key=lambda seqr: (seqr["coord_system_level"], seqr["name"]))
     return seq_regions
 
 
@@ -146,6 +150,8 @@ def get_synonyms(seq_region: SeqRegion, external_db_map: dict) -> List:
             else:
                 syn_obj = {"name": syn.synonym}
             syns.append(syn_obj)
+    
+    syns = sorted(syns, key=lambda syn: (syn["name"], syn.get("source", "")))
     return syns
 
 
@@ -173,6 +179,8 @@ def get_karyotype(seq_region: SeqRegion) -> List:
                 if structure:
                     kar["structure"] = structure
             kars.append(kar)
+    
+    kars = sorted(kars, key=lambda kar: kar["name"])
     return kars
 
 
