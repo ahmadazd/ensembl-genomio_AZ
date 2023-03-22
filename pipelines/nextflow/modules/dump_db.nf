@@ -15,9 +15,8 @@
 
 process DUMP_DB {
     publishDir "$out_dir/coredb/$db.division", mode: 'copy'
-    tag "Dump_$db.species"
-    label 'default'
-    time '1h'
+    tag "$db.species"
+    label "variable_2_8_32"
     maxForks 10
 
     input:

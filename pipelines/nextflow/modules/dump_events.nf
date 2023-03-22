@@ -15,9 +15,8 @@
 
 
 process DUMP_EVENTS {
-    tag "Dump_events:${db.species}"
-    label 'default'
-    time '1h'
+    tag "${db.species}"
+    label "variable_2_8_32"
 
     input:
         val server

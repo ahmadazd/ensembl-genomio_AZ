@@ -14,9 +14,8 @@
 // limitations under the License.
 
 process DUMP_SEQ_REGIONS {
-    tag "Dump_seq_regions:${db.species}"
-    label 'default'
-    time '1h'
+    tag "${db.species}"
+    label "variable_2_8_32"
 
     input:
         val server
