@@ -247,7 +247,7 @@ def main() -> None:
     if args.get("output_json"):
         output_file = Path(args.get("output_json"))
         with output_file.open("w") as output_fh:
-            output_fh.write(json.dumps(seq_regions_struct, indent=2))
+            output_fh.write(json.dumps(seq_regions_struct, indent=2, sort_keys=True))
     else:
         print(seq_regions_struct)
 
