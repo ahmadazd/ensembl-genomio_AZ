@@ -27,7 +27,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session, joinedload
 
 from ensembl.database import DBConnection
-from ensembl.core.models import SeqRegion, SeqRegionSynonym, SeqRegionAttrib
+from ensembl.core.models import CoordSystem, SeqRegion, SeqRegionSynonym, SeqRegionAttrib
 
 ROOT_DIR = Path(__file__).parent / "../../../../.."
 DEFAULT_MAP = ROOT_DIR / "config/external_db_map/default.txt"
@@ -50,33 +50,51 @@ def get_external_db_map(map_file: Path) -> Dict:
     return db_map
 
 
+def get_coord_systems(session: Session) -> List[CoordSystem]:
+    coord_systems = list()
+    coord_stmt = select(CoordSystem).filter(CoordSystem.attrib.like("%default_version%"))
+    for row in session.execute(coord_stmt).unique().all():
+        coord_systems.append(row[0])
+    return coord_systems
+
+
 def get_seq_regions(session: Session, external_db_map: dict) -> List[SeqRegion]:
-    seqr_stmt = select(SeqRegion).options(
-        joinedload(SeqRegion.seq_region_synonym).joinedload(SeqRegionSynonym.external_db),
-        joinedload(SeqRegion.seq_region_attrib).joinedload(SeqRegionAttrib.attrib_type),
-        joinedload(SeqRegion.karyotype),
-    )
+
+    coord_systems = get_coord_systems(session)
     seq_regions = []
-    for row in session.execute(seqr_stmt).unique().all():
-        seqr: SeqRegion = row[0]
-        seq_region = dict()
-        seq_region = {"name": seqr.name, "length": seqr.length}
-        synonyms = get_synonyms(seqr, external_db_map)
-        if synonyms:
-            seq_region["synonyms"] = synonyms
 
-        attribs = get_attribs(seqr)
-        if attribs:
-            attrib_dict = {attrib["source"]: attrib["value"] for attrib in attribs}
-            if "toplevel" not in attrib_dict:
-                continue
-            add_attribs(seq_region, attrib_dict)
+    for coord_system in coord_systems:
+        print(f"Dump coord {coord_system.name}")
+        seqr_stmt = select(SeqRegion).where(
+            SeqRegion.coord_system_id == coord_system.coord_system_id
+        ).options(
+            joinedload(SeqRegion.seq_region_synonym).joinedload(SeqRegionSynonym.external_db),
+            joinedload(SeqRegion.seq_region_attrib).joinedload(SeqRegionAttrib.attrib_type),
+            joinedload(SeqRegion.karyotype),
+        )
+        for row in session.execute(seqr_stmt).unique().all():
+            seqr: SeqRegion = row[0]
+            seq_region = dict()
+            seq_region = {"name": seqr.name, "length": seqr.length}
+            synonyms = get_synonyms(seqr, external_db_map)
+            if synonyms:
+                seq_region["synonyms"] = synonyms
 
-        karyotype = get_karyotype(seqr)
-        if karyotype:
-            seq_region["karyotype"] = karyotype
+            attribs = get_attribs(seqr)
+            if attribs:
+                attrib_dict = {attrib["source"]: attrib["value"] for attrib in attribs}
+                if "toplevel" not in attrib_dict:
+                    continue
+                add_attribs(seq_region, attrib_dict)
 
-        seq_regions.append(seq_region)
+            karyotype = get_karyotype(seqr)
+            if karyotype:
+                seq_region["karyotype_bands"] = karyotype
+            
+            if "coord_system_tag" not in seq_region:
+                seq_region["coord_system_level"] = coord_system.name
+
+            seq_regions.append(seq_region)
 
     return seq_regions
 
