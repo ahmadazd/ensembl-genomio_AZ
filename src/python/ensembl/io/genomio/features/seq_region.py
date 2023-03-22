@@ -168,7 +168,7 @@ class SeqRegion:
             seqr_dict["synonyms"] = [syn.to_brc_dict() for syn in self.synonyms]
 
         if self.karyotype_bands:
-            seqr_dict["karyotype"] = [band.to_brc_dict() for band in self.karyotype_bands]
+            seqr_dict["karyotype_bands"] = [band.to_brc_dict() for band in self.karyotype_bands]
 
         added_seq = self._get_added_sequence()
         if added_seq:
