@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # See the NOTICE file distributed with this work for additional information
 # regarding copyright ownership.
 #
@@ -15,10 +14,24 @@
 # limitations under the License.
 """TODO"""
 
+__all__ = ["get_json", "print_json"]
+
 import json
 from os import PathLike
 from pathlib import Path
+import shutil
 from typing import Any
+
+
+def get_json(json_path: PathLike) -> Any:
+    """Generic data JSON loader.
+
+    Args:
+        path: Path to the JSON file to load.
+
+    """
+    with Path(json_path).open("r") as json_file:
+        return json.load(json_file)
 
 
 def print_json(json_path: PathLike, data: Any) -> None:
@@ -31,14 +44,3 @@ def print_json(json_path: PathLike, data: Any) -> None:
     """
     with Path(json_path).open("w") as json_file:
         json_file.write(json.dumps(data, sort_keys=True, indent=4))
-
-
-def get_json(json_path: PathLike) -> Any:
-    """Generic data JSON loader.
-
-    Args:
-        path: Path to the JSON file to load.
-
-    """
-    with Path(json_path).open("r") as json_file:
-        return json.load(json_file)
