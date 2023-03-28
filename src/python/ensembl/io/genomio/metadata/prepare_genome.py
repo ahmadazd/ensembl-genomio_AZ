@@ -64,15 +64,15 @@ PROVIDER_DATA = {
 DEFAULT_API_URL = "https://www.ebi.ac.uk/ena/browser/api/xml/"
 
 
-def add_provider(genome_data: Dict, gff3_raw: Optional[PathLike] = None) -> None:
+def add_provider(genome_data: Dict, gff3_file: Optional[PathLike] = None) -> None:
     """Adds provider metadata for assembly and gene models in `genome_data`.
 
     Assembly provider metadata will only be added if it is missing, i.e. neither ``provider_name`` or
-    ``provider_url`` are present. The gene model metadata will only be added if `gff3_raw` is provided.
+    ``provider_url`` are present. The gene model metadata will only be added if `gff3_file` is provided.
 
     Args:
         genome_data: Genome information of assembly, accession and annotation.
-        gff3_raw: 
+        gff3_file: Path to GFF3 file to use as annotation source for this genome.
 
     """
     # Get accession provider
@@ -89,7 +89,7 @@ def add_provider(genome_data: Dict, gff3_raw: Optional[PathLike] = None) -> None
         assembly["provider_name"] = provider["assembly"]["provider_name"]
         assembly["provider_url"] = provider["assembly"]["provider_url"]
     # Add annotation provider if there are gene models
-    if gff3_raw:
+    if gff3_file:
         annotation = {}
         if "annotation" in genome_data:
             annotation = genome_data["annotation"]
@@ -209,21 +209,21 @@ def _get_node_text(node: Element, tag: str) -> Optional[str]:
 def prepare_genome_metadata(
     json_path: PathLike,
     output_dir: Optional[PathLike] = "",
-    gff3_raw: Optional[PathLike] = None,
+    gff3_file: Optional[PathLike] = None,
     base_api_url: Optional[str] = DEFAULT_API_URL,
 ) -> None:
     """TODO
 
     Args:
         json_file: Path to JSON file with genome metadata.
-        output_dir: 
-        gff3_raw: 
+        output_dir: Output directory where to generate the final `genome.json` file.
+        gff3_file: Path to GFF3 file to use as annotation source for this genome.
         base_api_url: Base API URL to fetch the accession's taxonomy data from.
 
     """
     genome_data = get_json(json_path)
     # Amend any missing metadata
-    add_provider(genome_data, gff3_raw)
+    add_provider(genome_data, gff3_file)
     add_assembly_version(genome_data)
     add_genebuild_metadata(genome_data)
     add_species_metadata(genome_data, base_api_url)
@@ -245,7 +245,9 @@ class InputSchema(argschema.ArgSchema):
     output_dir = argschema.fields.OutputDir(
         required=False,
         dump_default=".",
-        metadata={"description": "Folder where to store the updated genome metadata ($PWD by default)"},
+        metadata={
+            "description": "Output folder for the updated genome metadata JSON file. By default, $PWD."
+        },
     )
 
 
