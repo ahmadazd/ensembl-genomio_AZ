@@ -14,8 +14,16 @@
 # limitations under the License.
 """TODO"""
 
-__all__ = ["add_provider", "add_assembly_version", "add_genebuild_metadata", "add_species_metadata",
-           "get_taxonomy_from_accession", "prepare_genome_metadata", "PROVIDER_DATA", "DEFAULT_API_URL"]
+__all__ = [
+    "add_provider",
+    "add_assembly_version",
+    "add_genebuild_metadata",
+    "add_species_metadata",
+    "get_taxonomy_from_accession",
+    "prepare_genome_metadata",
+    "PROVIDER_DATA",
+    "DEFAULT_API_URL",
+]
 
 import datetime
 import os
@@ -93,7 +101,7 @@ def add_provider(genome_data: Dict, gff3_raw: Optional[PathLike] = None) -> None
 
 def add_assembly_version(genome_data: Dict) -> None:
     """Adds version number to the genome's assembly if one is not present already.
-    
+
     Args:
         genome_data: Genome information of assembly, accession and annotation.
 
@@ -110,7 +118,7 @@ def add_genebuild_metadata(genome_data: Dict) -> None:
     """Adds missing genebuild metadata.
 
     The default convention is to use the current date as ``version`` and ``start_date``.
-    
+
     Args:
         genome_data: Genome information of assembly, accession and annotation.
 
@@ -129,7 +137,7 @@ def add_species_metadata(genome_data: Dict, base_api_url: Optional[str] = DEFAUL
 
     The ``taxonomy_id``, ``strain`` and ``scientific_name`` will be fetched from the taxonomy information
     linked to the given accession.
-    
+
     Args:
         genome_data: Genome information of assembly, accession and annotation.
         base_api_url: Base API URL to fetch the accession's taxonomy data from.
@@ -148,7 +156,7 @@ def add_species_metadata(genome_data: Dict, base_api_url: Optional[str] = DEFAUL
 
 def get_taxonomy_from_accession(accession: str, base_api_url: Optional[str] = DEFAULT_API_URL) -> Dict:
     """Returns the taxonomy metadata associated to the given accession.
-    
+
     Args:
         accession: INSDC accession ID.
         base_api_url: Base API URL to fetch the accession's taxonomy data from.
@@ -231,12 +239,14 @@ def prepare_genome_metadata(
 
 class InputSchema(argschema.ArgSchema):
     """Input arguments expected by the entry point of this module."""
+
     json_file = argschema.fields.InputFile(
         required=True, metadata={"description": "Genome metadata JSON file path"}
     )
     output_dir = argschema.fields.OutputDir(
-        required=False, dump_default=".",
-        metadata={"description": "Folder where to store the updated genome metadata ($PWD by default)"}
+        required=False,
+        dump_default=".",
+        metadata={"description": "Folder where to store the updated genome metadata ($PWD by default)"},
     )
 
 

@@ -50,4 +50,3 @@ def main() -> None:
     """Main script entry-point."""
     mod = argschema.ArgSchemaParser(schema_type=InputSchema)
     validate_json_schema(mod.args["json_file"], mod.args["json_schema"])
-
