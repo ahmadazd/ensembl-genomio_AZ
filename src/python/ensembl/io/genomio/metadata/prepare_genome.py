@@ -228,8 +228,7 @@ def prepare_genome_metadata(
     add_genebuild_metadata(genome_data)
     add_species_metadata(genome_data, base_api_url)
     # Create output directory
-    # accession = genome_data["assembly"]["accession"]
-    accession = genome_data["BRC4"]["organism_abbrev"]
+    accession = genome_data["assembly"]["accession"]
     work_dir = Path(output_dir, accession)
     work_dir.mkdir(parents=True, exist_ok=True)
     # Dump updated genome metadata

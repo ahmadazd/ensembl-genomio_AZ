@@ -14,15 +14,14 @@
 // limitations under the License.
 
 process CHECK_JSON_SCHEMA {
-    tag "$json_file.name"
     label 'default'
 
     input:
-        path json_file
+    path accession
 
     script:
-        schema = params.json_schemas[json_file.baseName]
-        """
-        check_json_schema --json_file ${json_file} --json_schema ${schema}
-        """
+    json_schema = params.json_schemas["genome"]
+    """
+    check_json_schema --json_file ${accession}/genome.json --json_schema ${json_schema}
+    """
 }

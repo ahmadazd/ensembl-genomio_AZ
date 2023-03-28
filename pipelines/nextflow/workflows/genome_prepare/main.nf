@@ -27,9 +27,11 @@ if (params.input_dir) {
 
 // Import modules/subworkflows
 include { PREPARE_GENOME_METADATA } from '../../modules/prepare_genome_metadata.nf'
+include { CHECK_JSON_SCHEMA } from '../../modules/check_json_schema.nf'
 
 
 // Run main workflow
 workflow {
     ch_metadata_json = PREPARE_GENOME_METADATA(ch_genome_json)
+    CHECK_JSON_SCHEMA(ch_metadata_json)
 }

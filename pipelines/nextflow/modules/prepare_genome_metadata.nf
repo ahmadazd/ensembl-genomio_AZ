@@ -20,10 +20,9 @@ process PREPARE_GENOME_METADATA {
     path input_json
 
     output:
-    tuple val(accession), path("${accession}/genome.json")
+    path "*"
 
     script:
-    accession = input_json.getSimpleName()
     """
     prepare_genome_metadata --json_file ${input_json}
     """
