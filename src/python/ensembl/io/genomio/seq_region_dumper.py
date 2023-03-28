@@ -94,7 +94,7 @@ def get_seq_regions(session: Session, external_db_map: dict) -> List[SeqRegion]:
             if karyotype:
                 seq_region["karyotype_bands"] = karyotype
             
-            if "coord_system_tag" not in seq_region:
+            if "coord_system_level" not in seq_region:
                 seq_region["coord_system_level"] = coord_system.name
 
             seq_regions.append(seq_region)
