@@ -28,10 +28,13 @@ if (params.input_dir) {
 // Import modules/subworkflows
 include { PREPARE_GENOME_METADATA } from '../../modules/prepare_genome_metadata.nf'
 include { CHECK_JSON_SCHEMA } from '../../modules/check_json_schema.nf'
+include { DOWNLOAD_ASM_DATA } from '../../modules/download_asm_data.nf'
 
 
 // Run main workflow
 workflow {
     ch_metadata_json = PREPARE_GENOME_METADATA(ch_genome_json)
-    CHECK_JSON_SCHEMA(ch_metadata_json)
+    checked_jsons = CHECK_JSON_SCHEMA(ch_metadata_json)
+    genome_data = DOWNLOAD_ASM_DATA(checked_jsons)
+    genome_data.view()
 }
