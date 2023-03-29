@@ -17,11 +17,15 @@ process CHECK_JSON_SCHEMA {
     label 'default'
 
     input:
-    path accession
+    path accession_dir
+
+    output:
+    tuple val(accession), path("${accession_dir}/genome.json")
 
     script:
+    accession = accession_dir.getName()
     json_schema = params.json_schemas["genome"]
     """
-    check_json_schema --json_file ${accession}/genome.json --json_schema ${json_schema}
+    check_json_schema --json_file ${accession_dir}/genome.json --json_schema $json_schema
     """
 }
